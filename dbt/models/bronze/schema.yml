@@ -104,18 +104,29 @@ models:
         description: Current status of the order
       - name: online_order_flag
         description: Flag indicating if the order was placed online
+        tests:
+          - accepted_values:
+              values: [0, 1]
       - name: sales_order_number
         description: Unique sales order number
       - name: purchase_order_number
         description: Customer purchase order number
       - name: customer_id
         description: Foreign key reference to customer
+        tests:
+          - relationships:
+              to: ref('brnz_customers')
+              field: customer_id
       - name: sales_person_id
         description: ID of the sales person
       - name: territory_id
         description: Sales territory ID
       - name: product_id
         description: Foreign key reference to product
+        tests:
+          - relationships:
+              to: ref('brnz_products')
+              field: product_id
       - name: order_qty
         description: Quantity ordered
       - name: unit_price
@@ -124,6 +135,8 @@ models:
         description: Discount amount
       - name: line_total
         description: Total amount for this line item
+        tests:
+          - not_null
       - name: last_modified_date
         description: Last modified timestamp from source rows
     tests:

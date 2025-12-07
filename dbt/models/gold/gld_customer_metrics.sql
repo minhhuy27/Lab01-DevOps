@@ -1,10 +1,6 @@
 {{
     config(
-        materialized='table',
-        post_hook=[
-            "if not exists (select 1 from sys.indexes where name = 'ix_gld_customer_metrics_customer_id' and object_id = object_id('{{ this }}')) create nonclustered index ix_gld_customer_metrics_customer_id on {{ this }} (customer_id)",
-            "if not exists (select 1 from sys.indexes where name = 'ix_gld_customer_metrics_territory_id' and object_id = object_id('{{ this }}')) create nonclustered index ix_gld_customer_metrics_territory_id on {{ this }} (territory_id)"
-        ]
+        materialized='table'
     )
 }}
 
@@ -22,12 +18,12 @@ customer_sales as (
         c.full_name,
         c.territory_id,
         count(distinct s.sales_order_id) as total_orders,
-        sum(s.line_total) as total_revenue,
+        coalesce(sum(s.line_total), 0) as total_revenue,
         avg(s.line_total) as avg_order_value,
-        sum(s.order_qty) as total_items_purchased,
+        coalesce(sum(s.order_qty), 0) as total_items_purchased,
         min(s.order_date) as first_order_date,
         max(s.order_date) as last_order_date,
-        sum(case when s.has_discount = 1 then 1 else 0 end) as orders_with_discount
+        coalesce(sum(case when s.has_discount = 1 then 1 else 0 end), 0) as orders_with_discount
     from customers c
     left join sales s
         on c.customer_id = s.customer_id
