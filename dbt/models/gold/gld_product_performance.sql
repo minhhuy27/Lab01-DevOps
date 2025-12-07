@@ -1,6 +1,10 @@
 {{
     config(
-        materialized='table'
+        materialized='table',
+        post_hook=[
+            "if not exists (select 1 from sys.indexes where name = 'ix_gld_product_perf_product_id' and object_id = object_id('{{ this }}')) create nonclustered index ix_gld_product_perf_product_id on {{ this }} (product_id)",
+            "if not exists (select 1 from sys.indexes where name = 'ix_gld_product_perf_subcategory' and object_id = object_id('{{ this }}')) create nonclustered index ix_gld_product_perf_subcategory on {{ this }} (subcategory_name)"
+        ]
     )
 }}
 

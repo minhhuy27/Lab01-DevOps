@@ -1,6 +1,9 @@
 {{
     config(
-        materialized='table'
+        materialized='table',
+        post_hook=[
+            "if not exists (select 1 from sys.indexes where name = 'ix_gld_sales_summary_order_date' and object_id = object_id('{{ this }}')) create nonclustered index ix_gld_sales_summary_order_date on {{ this }} (order_date)"
+        ]
     )
 }}
 

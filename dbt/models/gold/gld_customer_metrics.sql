@@ -1,6 +1,10 @@
 {{
     config(
-        materialized='table'
+        materialized='table',
+        post_hook=[
+            "if not exists (select 1 from sys.indexes where name = 'ix_gld_customer_metrics_customer_id' and object_id = object_id('{{ this }}')) create nonclustered index ix_gld_customer_metrics_customer_id on {{ this }} (customer_id)",
+            "if not exists (select 1 from sys.indexes where name = 'ix_gld_customer_metrics_territory_id' and object_id = object_id('{{ this }}')) create nonclustered index ix_gld_customer_metrics_territory_id on {{ this }} (territory_id)"
+        ]
     )
 }}
 
