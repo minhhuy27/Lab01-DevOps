@@ -49,4 +49,3 @@ airflow/plugins/__pycache__/
 *.log
 
 DATAOPS_PROJECT_REQUIREMENTS.md
-
