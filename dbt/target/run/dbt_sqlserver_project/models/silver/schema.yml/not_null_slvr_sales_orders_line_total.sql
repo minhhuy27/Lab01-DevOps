@@ -6,19 +6,10 @@
   USE [AdventureWorks2014];
   EXEC('create view 
 
-    [dbt_test__audit.testview_a850aad6cc7eb3d6573028804fd3d337]
+    [dbt_test__audit.testview_bd2b6ffc3ab3618911226910f2449655]
    as 
-    
-    
-
-
-
-select line_total
-from "AdventureWorks2014"."silver"."slvr_sales_orders"
-where line_total is null
-
-
-;')
+        select * from "AdventureWorks2014"."dbt_test__audit"."not_null_slvr_sales_orders_line_total"
+    ;')
   select
     count(*) as failures,
     case when count(*) != 0
@@ -28,12 +19,12 @@ where line_total is null
   from (
     select  * from 
 
-    [dbt_test__audit.testview_a850aad6cc7eb3d6573028804fd3d337]
+    [dbt_test__audit.testview_bd2b6ffc3ab3618911226910f2449655]
   
   ) dbt_internal_test;
 
   USE [AdventureWorks2014];
   EXEC('drop view 
 
-    [dbt_test__audit.testview_a850aad6cc7eb3d6573028804fd3d337]
+    [dbt_test__audit.testview_bd2b6ffc3ab3618911226910f2449655]
   ;')

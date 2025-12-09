@@ -6,19 +6,10 @@
   USE [AdventureWorks2014];
   EXEC('create view 
 
-    [dbt_test__audit.testview_cc9892373490dc0e75e52b5e48a6658b]
+    [dbt_test__audit.testview_71c3c22dbcbc50cb682e4d8aca42c4f1]
    as 
-    
-    
-
-
-
-select product_id
-from "AdventureWorks2014"."gold"."gld_product_performance"
-where product_id is null
-
-
-;')
+        select * from "AdventureWorks2014"."dbt_test__audit"."not_null_gld_product_performance_product_id"
+    ;')
   select
     count(*) as failures,
     case when count(*) != 0
@@ -28,12 +19,12 @@ where product_id is null
   from (
     select  * from 
 
-    [dbt_test__audit.testview_cc9892373490dc0e75e52b5e48a6658b]
+    [dbt_test__audit.testview_71c3c22dbcbc50cb682e4d8aca42c4f1]
   
   ) dbt_internal_test;
 
   USE [AdventureWorks2014];
   EXEC('drop view 
 
-    [dbt_test__audit.testview_cc9892373490dc0e75e52b5e48a6658b]
+    [dbt_test__audit.testview_71c3c22dbcbc50cb682e4d8aca42c4f1]
   ;')

@@ -6,22 +6,10 @@
   USE [AdventureWorks2014];
   EXEC('create view 
 
-    [dbt_test__audit.testview_a5fdc387d46671207c7aad6c3cd2e325]
+    [dbt_test__audit.testview_bfbcfb714c927a7121f425865100dfb0]
    as 
-    
-    
-
-select
-    order_date as unique_field,
-    count(*) as n_records
-
-from "AdventureWorks2014"."gold"."gld_sales_summary"
-where order_date is not null
-group by order_date
-having count(*) > 1
-
-
-;')
+        select * from "AdventureWorks2014"."dbt_test__audit"."unique_gld_sales_summary_order_date"
+    ;')
   select
     count(*) as failures,
     case when count(*) != 0
@@ -31,12 +19,12 @@ having count(*) > 1
   from (
     select  * from 
 
-    [dbt_test__audit.testview_a5fdc387d46671207c7aad6c3cd2e325]
+    [dbt_test__audit.testview_bfbcfb714c927a7121f425865100dfb0]
   
   ) dbt_internal_test;
 
   USE [AdventureWorks2014];
   EXEC('drop view 
 
-    [dbt_test__audit.testview_a5fdc387d46671207c7aad6c3cd2e325]
+    [dbt_test__audit.testview_bfbcfb714c927a7121f425865100dfb0]
   ;')

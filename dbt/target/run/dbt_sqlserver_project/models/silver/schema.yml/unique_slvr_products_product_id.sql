@@ -6,22 +6,10 @@
   USE [AdventureWorks2014];
   EXEC('create view 
 
-    [dbt_test__audit.testview_148c6a75e63858463ea2cb5c71e062ae]
+    [dbt_test__audit.testview_d34fe5a576393d6857f5b433b596c89a]
    as 
-    
-    
-
-select
-    product_id as unique_field,
-    count(*) as n_records
-
-from "AdventureWorks2014"."silver"."slvr_products"
-where product_id is not null
-group by product_id
-having count(*) > 1
-
-
-;')
+        select * from "AdventureWorks2014"."dbt_test__audit"."unique_slvr_products_product_id"
+    ;')
   select
     count(*) as failures,
     case when count(*) != 0
@@ -31,12 +19,12 @@ having count(*) > 1
   from (
     select  * from 
 
-    [dbt_test__audit.testview_148c6a75e63858463ea2cb5c71e062ae]
+    [dbt_test__audit.testview_d34fe5a576393d6857f5b433b596c89a]
   
   ) dbt_internal_test;
 
   USE [AdventureWorks2014];
   EXEC('drop view 
 
-    [dbt_test__audit.testview_148c6a75e63858463ea2cb5c71e062ae]
+    [dbt_test__audit.testview_d34fe5a576393d6857f5b433b596c89a]
   ;')

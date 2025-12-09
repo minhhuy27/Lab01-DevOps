@@ -4,7 +4,7 @@
 
 
 
-select customer_id
+select *
 from "AdventureWorks2014"."silver"."slvr_customers"
 where customer_id is null
 

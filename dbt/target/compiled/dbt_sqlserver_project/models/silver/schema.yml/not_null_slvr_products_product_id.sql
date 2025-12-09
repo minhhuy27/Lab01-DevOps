@@ -4,7 +4,7 @@
 
 
 
-select product_id
+select *
 from "AdventureWorks2014"."silver"."slvr_products"
 where product_id is null
 

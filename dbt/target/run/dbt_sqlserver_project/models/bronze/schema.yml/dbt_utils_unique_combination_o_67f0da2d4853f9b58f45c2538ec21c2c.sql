@@ -6,28 +6,10 @@
   USE [AdventureWorks2014];
   EXEC('create view 
 
-    [dbt_test__audit.testview_e469becceeffdd2d421a7c040b481e1c]
+    [dbt_test__audit.testview_71141f817fe9a32a1dd5435647cd56a7]
    as 
-
-
-
-
-
-with validation_errors as (
-
-    select
-        sales_order_id, order_detail_id
-    from "AdventureWorks2014"."bronze"."brnz_sales_orders"
-    group by sales_order_id, order_detail_id
-    having count(*) > 1
-
-)
-
-select *
-from validation_errors
-
-
-;')
+        select * from "AdventureWorks2014"."dbt_test__audit"."dbt_utils_unique_combination_o_67f0da2d4853f9b58f45c2538ec21c2c"
+    ;')
   select
     count(*) as failures,
     case when count(*) != 0
@@ -37,12 +19,12 @@ from validation_errors
   from (
     select  * from 
 
-    [dbt_test__audit.testview_e469becceeffdd2d421a7c040b481e1c]
+    [dbt_test__audit.testview_71141f817fe9a32a1dd5435647cd56a7]
   
   ) dbt_internal_test;
 
   USE [AdventureWorks2014];
   EXEC('drop view 
 
-    [dbt_test__audit.testview_e469becceeffdd2d421a7c040b481e1c]
+    [dbt_test__audit.testview_71141f817fe9a32a1dd5435647cd56a7]
   ;')

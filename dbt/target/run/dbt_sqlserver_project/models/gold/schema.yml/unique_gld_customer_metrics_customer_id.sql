@@ -6,22 +6,10 @@
   USE [AdventureWorks2014];
   EXEC('create view 
 
-    [dbt_test__audit.testview_5f7b2598cc17043d5003374d688d45b9]
+    [dbt_test__audit.testview_bc79d89af29c5139af51a5fbb40201b5]
    as 
-    
-    
-
-select
-    customer_id as unique_field,
-    count(*) as n_records
-
-from "AdventureWorks2014"."gold"."gld_customer_metrics"
-where customer_id is not null
-group by customer_id
-having count(*) > 1
-
-
-;')
+        select * from "AdventureWorks2014"."dbt_test__audit"."unique_gld_customer_metrics_customer_id"
+    ;')
   select
     count(*) as failures,
     case when count(*) != 0
@@ -31,12 +19,12 @@ having count(*) > 1
   from (
     select  * from 
 
-    [dbt_test__audit.testview_5f7b2598cc17043d5003374d688d45b9]
+    [dbt_test__audit.testview_bc79d89af29c5139af51a5fbb40201b5]
   
   ) dbt_internal_test;
 
   USE [AdventureWorks2014];
   EXEC('drop view 
 
-    [dbt_test__audit.testview_5f7b2598cc17043d5003374d688d45b9]
+    [dbt_test__audit.testview_bc79d89af29c5139af51a5fbb40201b5]
   ;')
