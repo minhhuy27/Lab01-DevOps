@@ -6,7 +6,7 @@
   USE [AdventureWorks2014];
   EXEC('create view 
 
-    [dbt_test__audit.testview_bc79d89af29c5139af51a5fbb40201b5]
+    [dbt_test__audit.testview_e1901c37eddf3b3f8e1b0e3d9b481286]
    as 
         select * from "AdventureWorks2014"."dbt_test__audit"."unique_gld_customer_metrics_customer_id"
     ;')
@@ -19,12 +19,12 @@
   from (
     select  * from 
 
-    [dbt_test__audit.testview_bc79d89af29c5139af51a5fbb40201b5]
+    [dbt_test__audit.testview_e1901c37eddf3b3f8e1b0e3d9b481286]
   
   ) dbt_internal_test;
 
   USE [AdventureWorks2014];
   EXEC('drop view 
 
-    [dbt_test__audit.testview_bc79d89af29c5139af51a5fbb40201b5]
+    [dbt_test__audit.testview_e1901c37eddf3b3f8e1b0e3d9b481286]
   ;')

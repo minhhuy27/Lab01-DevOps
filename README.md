@@ -1,5 +1,8 @@
 # DBT and Airflow Data Pipeline Project
 
+[![CI](https://github.com/minhhuy27/Lab01-DevOps/actions/workflows/ci.yml/badge.svg)](https://github.com/minhhuy27/Lab01-DevOps/actions/workflows/ci.yml)
+[![Deploy](https://github.com/minhhuy27/Lab01-DevOps/actions/workflows/deploy.yml/badge.svg)](https://github.com/minhhuy27/Lab01-DevOps/actions/workflows/deploy.yml)
+
 ## Project Overview
 This project implements an automated data transformation pipeline using DBT (Data Build Tool) and Apache Airflow. The pipeline extracts data from SQL Server, transforms it using DBT models, and loads it into a target database, following modern data engineering best practices.
 
@@ -386,6 +389,18 @@ We use containers for several important reasons:
    - Never commit sensitive credentials
    - Use environment variables for secrets
    - Regularly update dependencies
+
+## CI/CD Workflows
+- **CI (`.github/workflows/ci.yml`)**: PR metadata validation, Python linting (`black`, `flake8`), SQL linting (`sqlfluff`), dbt compile/test (`dbt deps`, `dbt compile`, `dbt test --store-failures`), and dbt docs artifacts on pull requests.
+- **Deploy (`.github/workflows/deploy.yml`)**: Auto-deploys on push to `develop` (dev) and `main` (prod); manual dispatch supports dev/prod and rollback mode.
+- **Notifications & artifacts**: Commit comments summarize deployment outcomes; `dbt-logs.tar.gz` and dbt `target/` uploaded per run.
+- **Health checks**: `dbt test --fail-fast --store-failures` and `dbt source freshness` run post-deploy. Preflight includes `dbt debug` + `dbt compile --warn-error`.
+- **Profiles**: CI/CD use `.github/dbt/profiles.yml` with environment variables (set secrets like `DBT_DEV_SERVER`, `DBT_PROD_SERVER`, etc.).
+
+## Deployment & Monitoring
+- Detailed steps and recovery procedures live in `DEPLOYMENT_RUNBOOK.md`; log deployments in `DEPLOYMENT_HISTORY.md`.
+- Monitor runs via GitHub Actions checks and commit comments; review artifacts for logs and docs.
+- Rollbacks: trigger Deploy workflow with `run_mode=rollback`, `target_env` (dev/prod), and `rollback_ref` (commit/branch/tag) to reapply a previous state with `dbt run --full-refresh` + `dbt test`.
 
 ## Troubleshooting
 
