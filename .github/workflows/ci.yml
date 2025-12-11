@@ -1,0 +1,228 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: "3.11"
+  DBT_PROFILES_DIR: ".github/dbt"
+  DBT_TARGET: "dev"
+
+jobs:
+  pr_validation:
+    name: PR validation
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate PR title, file sizes, and conflicts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pull_number = context.payload.pull_request.number;
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number,
+            });
+
+            const titlePattern = /^(feat|fix|chore|docs|ci|refactor|test):\s.+/i;
+            if (!titlePattern.test(pr.title)) {
+              core.setFailed(
+                `PR title must match "<type>: summary" (feat|fix|chore|docs|ci|refactor|test). Current: "${pr.title}"`
+              );
+            }
+
+            if (pr.mergeable_state === "dirty") {
+              core.setFailed("PR has merge conflicts. Please resolve before merging.");
+            }
+
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number,
+              per_page: 100,
+            });
+
+            const oversize = files.filter((file) => file.changes > 0 && file.changes > 2000 || file.additions + file.deletions > 4000);
+            if (oversize.length > 0) {
+              core.setFailed(
+                `PR touches very large files/changes: ${oversize
+                  .map((f) => `${f.filename} (${f.additions + f.deletions} changes)`)
+                  .join(", ")}`
+              );
+            }
+
+            const bigBinary = files.filter((file) => (file.status === "added" || file.status === "modified") && (file.patch === undefined));
+            if (bigBinary.length > 0) {
+              core.info(`Binary/large files detected: ${bigBinary.map((f) => f.filename).join(", ")}`);
+            }
+
+  lint_python:
+    name: Lint Python (black/flake8)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r airflow/requirements.txt -r dbt/requirements.txt black flake8
+
+      - name: Run black
+        run: black --check airflow dbt
+
+      - name: Run flake8
+        run: flake8 airflow dbt
+
+  lint_sql:
+    name: Lint SQL (sqlfluff)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install SQLFluff
+        run: |
+          python -m pip install --upgrade pip
+          pip install "sqlfluff[dbt]" dbt-core dbt-sqlserver
+
+      - name: Lint SQL models
+        run: sqlfluff lint dbt/models
+
+  dbt_compile:
+    name: dbt compile
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install ODBC dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unixodbc-dev
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r dbt/requirements.txt
+
+      - name: Install dbt packages
+        working-directory: dbt
+        run: dbt deps --profiles-dir ../.github/dbt --target dev
+
+      - name: Compile models
+        working-directory: dbt
+        env:
+          DBT_DEV_SERVER: ${{ secrets.DBT_DEV_SERVER || 'localhost' }}
+          DBT_DEV_USER: ${{ secrets.DBT_DEV_USER || 'sa' }}
+          DBT_DEV_PASSWORD: ${{ secrets.DBT_DEV_PASSWORD || 'Password123!' }}
+          DBT_DEV_DATABASE: ${{ secrets.DBT_DEV_DATABASE || 'AdventureWorks2014' }}
+        run: dbt compile --profiles-dir ../.github/dbt --target dev --warn-error
+
+  dbt_tests:
+    name: dbt tests on PRs
+    runs-on: ubuntu-latest
+    needs: dbt_compile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install ODBC dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unixodbc-dev
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r dbt/requirements.txt
+
+      - name: Install dbt packages
+        working-directory: dbt
+        run: dbt deps --profiles-dir ../.github/dbt --target dev
+
+      - name: Run dbt tests
+        working-directory: dbt
+        env:
+          DBT_DEV_SERVER: ${{ secrets.DBT_DEV_SERVER || 'localhost' }}
+          DBT_DEV_USER: ${{ secrets.DBT_DEV_USER || 'sa' }}
+          DBT_DEV_PASSWORD: ${{ secrets.DBT_DEV_PASSWORD || 'Password123!' }}
+          DBT_DEV_DATABASE: ${{ secrets.DBT_DEV_DATABASE || 'AdventureWorks2014' }}
+        run: dbt test --profiles-dir ../.github/dbt --target dev --store-failures --fail-fast
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-test-artifacts
+          path: |
+            dbt/target
+            dbt/logs
+
+  docs:
+    name: Build dbt docs
+    runs-on: ubuntu-latest
+    needs: dbt_compile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install ODBC dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unixodbc-dev
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r dbt/requirements.txt
+
+      - name: Install dbt packages
+        working-directory: dbt
+        run: dbt deps --profiles-dir ../.github/dbt --target dev
+
+      - name: Generate docs
+        working-directory: dbt
+        env:
+          DBT_DEV_SERVER: ${{ secrets.DBT_DEV_SERVER || 'localhost' }}
+          DBT_DEV_USER: ${{ secrets.DBT_DEV_USER || 'sa' }}
+          DBT_DEV_PASSWORD: ${{ secrets.DBT_DEV_PASSWORD || 'Password123!' }}
+          DBT_DEV_DATABASE: ${{ secrets.DBT_DEV_DATABASE || 'AdventureWorks2014' }}
+        run: dbt docs generate --profiles-dir ../.github/dbt --target dev
+
+      - name: Upload docs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-docs
+          path: dbt/target

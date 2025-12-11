@@ -41,6 +41,8 @@ services:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
       - AIRFLOW__CORE__FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+      - DBT_CONTAINER_NAME=lab01-devops-dbt-1
+      - DBT_ALERT_EMAILS=tuananhpq20@gmail.com
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/logs:/opt/airflow/logs
@@ -64,6 +66,8 @@ services:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
       - AIRFLOW__CORE__FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+      - DBT_CONTAINER_NAME=lab01-devops-dbt-1
+      - DBT_ALERT_EMAILS=tuananhpq20@gmail.com
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/logs:/opt/airflow/logs
@@ -82,7 +86,7 @@ services:
       - sqlserver
     volumes:
       - ./dbt:/usr/app/dbt
-    command: tail -f /dev/null  # Keep container running
+    command: tail -f /dev/null # Keep container running
     networks:
       - dbt_airflow_network
 
@@ -92,4 +96,4 @@ volumes:
 
 networks:
   dbt_airflow_network:
-    driver: bridge 
+    driver: bridge

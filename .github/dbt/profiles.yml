@@ -1,0 +1,41 @@
+dbt_airflow_project:
+  target: "{{ env_var('DBT_TARGET', 'dev') }}"
+  outputs:
+    dev:
+      type: sqlserver
+      driver: "{{ env_var('DBT_ODBC_DRIVER', 'ODBC Driver 17 for SQL Server') }}"
+      server: "{{ env_var('DBT_DEV_SERVER', 'localhost') }}"
+      port: "{{ env_var('DBT_DEV_PORT', '1433') | int }}"
+      database: "{{ env_var('DBT_DEV_DATABASE', 'AdventureWorks2014') }}"
+      schema: "{{ env_var('DBT_DEV_SCHEMA', 'dbo') }}"
+      user: "{{ env_var('DBT_DEV_USER', 'sa') }}"
+      password: "{{ env_var('DBT_DEV_PASSWORD', 'Password123!') }}"
+      windows_login: false
+      encrypt: false
+      trust_cert: true
+      threads: "{{ env_var('DBT_DEV_THREADS', '4') | int }}"
+      timeout_seconds: "{{ env_var('DBT_TIMEOUT_SECONDS', '300') | int }}"
+      retries: "{{ env_var('DBT_RETRIES', '3') | int }}"
+      authentication: sql
+      keepalives_idle: 0
+      application_name: dbt_airflow_project
+      retry_on_error: true
+    prod:
+      type: sqlserver
+      driver: "{{ env_var('DBT_ODBC_DRIVER', 'ODBC Driver 17 for SQL Server') }}"
+      server: "{{ env_var('DBT_PROD_SERVER', 'localhost') }}"
+      port: "{{ env_var('DBT_PROD_PORT', '1433') | int }}"
+      database: "{{ env_var('DBT_PROD_DATABASE', 'AdventureWorks2014') }}"
+      schema: "{{ env_var('DBT_PROD_SCHEMA', 'dbo') }}"
+      user: "{{ env_var('DBT_PROD_USER', 'sa') }}"
+      password: "{{ env_var('DBT_PROD_PASSWORD', 'Password123!') }}"
+      windows_login: false
+      encrypt: false
+      trust_cert: true
+      threads: "{{ env_var('DBT_PROD_THREADS', '4') | int }}"
+      timeout_seconds: "{{ env_var('DBT_TIMEOUT_SECONDS', '300') | int }}"
+      retries: "{{ env_var('DBT_RETRIES', '3') | int }}"
+      authentication: sql
+      keepalives_idle: 0
+      application_name: dbt_airflow_project
+      retry_on_error: true
