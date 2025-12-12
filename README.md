@@ -63,6 +63,8 @@ flowchart LR
 ├─ sqlserver/
 │  ├─ Dockerfile               # khởi SQL Server + restore AdventureWorks2014
 │  └─ restore_db.sh
+├─ grafana/
+│  ├─ provisioning/: datasource + dashboards (Airflow/DBT Overview)
 ├─ docker-compose.yml          # SQL Server, Postgres, Airflow, dbt
 ├─ .sqlfluff, setup.cfg        # lint configs
 └─ README.md, DATAOPS_PROJECT_REQUIREMENTS.md
@@ -133,12 +135,13 @@ docker compose exec dbt dbt docs serve --host 0.0.0.0 --port 8001
 ```
 Mở http://localhost:8001 để xem catalog và DBT Lineage Graph (bronze → silver → gold).
 
-## 10. Contributors
+## 10. Monitoring
+- Thành phần: Grafana (cổng 3000) + Postgres metadata Airflow (datasource `Airflow Metadata`).
+- Truy cập: http://localhost:3000 (tài khoản mặc định `admin/admin`).
+- Dashboard: Airflow/DBT Overview được provision sẵn (DAG runs by state, Task instances by state, DAG runs per day).
+- Yêu cầu: `docker compose up -d` để khởi động `postgres`, `airflow-webserver`, `airflow-scheduler`, `dbt`, `grafana`.
+- Nếu panel báo “no data”: trigger DAG `dbt_pipeline` để Airflow ghi dữ liệu vào `dag_run` và `task_instance`, sau đó refresh hoặc mở rộng time range.
+
+## 11. Contributors
 - Lê Tuấn Anh - MSSV: 22120011
 - Nguyễn Minh Huy - MSSV: 22120137
-## 11. Monitoring (Grafana bonus)
-- `docker compose up -d` d? kh?i Grafana (port 3000).
-- URL: http://localhost:3000, login m?c d?nh `admin/admin`.
-- Datasource d� c�i s?n: `Airflow Metadata` (Postgres metadata Airflow).
-- Dashboard auto-provisioned: **Airflow/DBT Overview** (DAG runs by state, task instances by state, DAG runs per day) trong folder Grafana "Airflow/DBT".
-- C?n c�c container `postgres`, `airflow-*`, `dbt` dang ch?y; m? port 3000.
