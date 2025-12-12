@@ -187,6 +187,7 @@ jobs:
         run: dbt run --profiles-dir ../.github/dbt --target ${{ needs.preflight.outputs.target_env }} --fail-fast
 
       - name: Data quality tests
+        if: steps.check_creds_deploy.outputs.has_creds == 'true'
         working-directory: dbt
         env:
           DBT_DEV_SERVER: localhost
