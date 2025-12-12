@@ -32,6 +32,7 @@ on:
 env:
   PYTHON_VERSION: "3.11"
   DBT_PROFILES_DIR: ".github/dbt"
+  RUN_DB_TASKS: "false"
 permissions:
   contents: write
 
@@ -124,7 +125,7 @@ jobs:
       - name: Detect prod credentials
         id: check_creds_deploy
         run: |
-          if [ -n "${{ secrets.DBT_PROD_SERVER }}" ] && [ -n "${{ secrets.DBT_PROD_USER }}" ] && [ -n "${{ secrets.DBT_PROD_PASSWORD }}" ] && [ -n "${{ secrets.DBT_PROD_DATABASE }}" ]; then
+          if [ "${{ env.RUN_DB_TASKS }}" = "true" ] && [ -n "${{ secrets.DBT_PROD_SERVER }}" ] && [ -n "${{ secrets.DBT_PROD_USER }}" ] && [ -n "${{ secrets.DBT_PROD_PASSWORD }}" ] && [ -n "${{ secrets.DBT_PROD_DATABASE }}" ]; then
             echo "has_creds=true" >> "$GITHUB_OUTPUT"
           else
             echo "has_creds=false" >> "$GITHUB_OUTPUT"
