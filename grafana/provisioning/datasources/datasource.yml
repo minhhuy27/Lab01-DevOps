@@ -1,6 +1,7 @@
 apiVersion: 1
 datasources:
   - name: Airflow Metadata
+    uid: airflow_metadata
     type: postgres
     access: proxy
     url: postgres:5432
