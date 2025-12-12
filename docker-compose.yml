@@ -21,6 +21,7 @@ services:
 
   postgres:
     image: postgres:13
+    restart: unless-stopped
     environment:
       - POSTGRES_USER=airflow
       - POSTGRES_PASSWORD=airflow
@@ -41,6 +42,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    restart: unless-stopped
     environment:
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
@@ -57,6 +59,12 @@ services:
     ports:
       - "8080:8080"
     command: bash -c "airflow db init && airflow users create --username admin --firstname Admin --lastname User --role Admin --email admin@example.com --password admin && airflow webserver"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
     networks:
       - dbt_airflow_network
 
@@ -65,7 +73,8 @@ services:
       context: ./airflow
       dockerfile: Dockerfile
     depends_on:
-      - airflow-webserver
+      airflow-webserver:
+        condition: service_healthy
     environment:
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
@@ -73,6 +82,7 @@ services:
       - AIRFLOW__CORE__FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
       - DBT_CONTAINER_NAME=lab01-devops-dbt-1
       - DBT_ALERT_EMAILS=tuananhpq20@gmail.com
+    restart: unless-stopped
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/logs:/opt/airflow/logs
@@ -90,6 +100,7 @@ services:
     depends_on:
       sqlserver:
         condition: service_healthy
+    restart: unless-stopped
     volumes:
       - ./dbt:/usr/app/dbt
     command: tail -f /dev/null # Keep container running
@@ -102,6 +113,7 @@ services:
     image: grafana/grafana:10.2.3
     depends_on:
       - postgres
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
