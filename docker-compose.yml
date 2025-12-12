@@ -93,6 +93,8 @@ services:
     volumes:
       - ./dbt:/usr/app/dbt
     command: tail -f /dev/null # Keep container running
+    ports:
+      - "8001:8001"  # expose dbt docs serve
     networks:
       - dbt_airflow_network
 
