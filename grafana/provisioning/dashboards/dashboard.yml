@@ -1,0 +1,10 @@
+apiVersion: 1
+providers:
+  - name: "Airflow/DBT"
+    orgId: 1
+    folder: "Airflow/DBT"
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards

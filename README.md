@@ -136,3 +136,9 @@ Mở http://localhost:8001 để xem catalog và DBT Lineage Graph (bronze → s
 ## 10. Contributors
 - Lê Tuấn Anh - MSSV: 22120011
 - Nguyễn Minh Huy - MSSV: 22120137
+## 11. Monitoring (Grafana bonus)
+- `docker compose up -d` d? kh?i Grafana (port 3000).
+- URL: http://localhost:3000, login m?c d?nh `admin/admin`.
+- Datasource d� c�i s?n: `Airflow Metadata` (Postgres metadata Airflow).
+- Dashboard auto-provisioned: **Airflow/DBT Overview** (DAG runs by state, task instances by state, DAG runs per day) trong folder Grafana "Airflow/DBT".
+- C?n c�c container `postgres`, `airflow-*`, `dbt` dang ch?y; m? port 3000.
