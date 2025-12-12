@@ -121,6 +121,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Detect prod credentials
+        id: check_creds_deploy
+        run: |
+          if [ -n "${{ secrets.DBT_PROD_SERVER }}" ] && [ -n "${{ secrets.DBT_PROD_USER }}" ] && [ -n "${{ secrets.DBT_PROD_PASSWORD }}" ] && [ -n "${{ secrets.DBT_PROD_DATABASE }}" ]; then
+            echo "has_creds=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_creds=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install ODBC dependencies
         run: |
           sudo apt-get update
@@ -137,6 +146,7 @@ jobs:
           echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> $GITHUB_ENV
 
       - name: Start local SQL Server fallback (no secrets)
+        if: steps.check_creds_deploy.outputs.has_creds != 'true'
         env:
           SA_PASSWORD: Password123!
         run: |
@@ -160,6 +170,7 @@ jobs:
         run: dbt deps --profiles-dir ../.github/dbt --target ${{ needs.preflight.outputs.target_env }}
 
       - name: Run dbt models
+        if: steps.check_creds_deploy.outputs.has_creds == 'true'
         working-directory: dbt
         env:
           DBT_DEV_SERVER: localhost
@@ -190,6 +201,7 @@ jobs:
         run: dbt test --profiles-dir ../.github/dbt --target ${{ needs.preflight.outputs.target_env }} --store-failures --fail-fast
 
       - name: Post-deployment health checks
+        if: steps.check_creds_deploy.outputs.has_creds == 'true'
         working-directory: dbt
         env:
           DBT_DEV_SERVER: localhost
@@ -205,6 +217,23 @@ jobs:
         run: |
           dbt source freshness --profiles-dir ../.github/dbt --target ${{ needs.preflight.outputs.target_env }} --output json
           dbt list --profiles-dir ../.github/dbt --target ${{ needs.preflight.outputs.target_env }} --resource-type model
+
+      - name: Offline compile (fallback, no prod creds)
+        if: steps.check_creds_deploy.outputs.has_creds != 'true'
+        working-directory: dbt
+        env:
+          DBT_DEV_SERVER: localhost
+          DBT_DEV_USER: sa
+          DBT_DEV_PASSWORD: Password123!
+          DBT_DEV_DATABASE: AdventureWorks2014
+          DBT_PROD_SERVER: localhost
+          DBT_PROD_USER: sa
+          DBT_PROD_PASSWORD: Password123!
+          DBT_PROD_DATABASE: AdventureWorks2014
+          DBT_ODBC_DRIVER: "ODBC Driver 18 for SQL Server"
+          LD_LIBRARY_PATH: /opt/microsoft/msodbcsql18/lib64:${LD_LIBRARY_PATH}
+        run: |
+          dbt parse --profiles-dir ../.github/dbt --target ${{ needs.preflight.outputs.target_env }}
 
       - name: Package deployment logs
         if: always()
