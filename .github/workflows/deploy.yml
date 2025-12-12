@@ -60,6 +60,36 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y unixodbc-dev
 
+      - name: Install SQL Server ODBC driver (msodbcsql18)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl apt-transport-https gnupg
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+          curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 mssql-tools18 unixodbc-dev
+          echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> $GITHUB_ENV
+
+      - name: Install SQL Server ODBC driver (msodbcsql18)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl apt-transport-https gnupg
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+          curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 mssql-tools18 unixodbc-dev
+          echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> $GITHUB_ENV
+
+      - name: Install SQL Server ODBC driver (msodbcsql18)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl apt-transport-https gnupg
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+          curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 mssql-tools18 unixodbc-dev
+          echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> $GITHUB_ENV
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -85,6 +115,7 @@ jobs:
           DBT_PROD_USER: ${{ secrets.DBT_PROD_USER || secrets.DBT_DEV_USER || 'sa' }}
           DBT_PROD_PASSWORD: ${{ secrets.DBT_PROD_PASSWORD || secrets.DBT_DEV_PASSWORD || 'Password123!' }}
           DBT_PROD_DATABASE: ${{ secrets.DBT_PROD_DATABASE || secrets.DBT_DEV_DATABASE || 'AdventureWorks2014' }}
+          DBT_ODBC_DRIVER: "ODBC Driver 18 for SQL Server"
         run: |
           dbt debug --profiles-dir ../.github/dbt --target ${{ steps.resolve_env.outputs.target_env }}
           dbt compile --profiles-dir ../.github/dbt --target ${{ steps.resolve_env.outputs.target_env }} --warn-error
@@ -128,6 +159,7 @@ jobs:
           DBT_PROD_USER: ${{ secrets.DBT_PROD_USER || secrets.DBT_DEV_USER || 'sa' }}
           DBT_PROD_PASSWORD: ${{ secrets.DBT_PROD_PASSWORD || secrets.DBT_DEV_PASSWORD || 'Password123!' }}
           DBT_PROD_DATABASE: ${{ secrets.DBT_PROD_DATABASE || secrets.DBT_DEV_DATABASE || 'AdventureWorks2014' }}
+          DBT_ODBC_DRIVER: "ODBC Driver 18 for SQL Server"
         run: dbt run --profiles-dir ../.github/dbt --target ${{ needs.preflight.outputs.target_env }} --fail-fast
 
       - name: Data quality tests
@@ -141,6 +173,7 @@ jobs:
           DBT_PROD_USER: ${{ secrets.DBT_PROD_USER || secrets.DBT_DEV_USER || 'sa' }}
           DBT_PROD_PASSWORD: ${{ secrets.DBT_PROD_PASSWORD || secrets.DBT_DEV_PASSWORD || 'Password123!' }}
           DBT_PROD_DATABASE: ${{ secrets.DBT_PROD_DATABASE || secrets.DBT_DEV_DATABASE || 'AdventureWorks2014' }}
+          DBT_ODBC_DRIVER: "ODBC Driver 18 for SQL Server"
         run: dbt test --profiles-dir ../.github/dbt --target ${{ needs.preflight.outputs.target_env }} --store-failures --fail-fast
 
       - name: Post-deployment health checks
@@ -154,6 +187,7 @@ jobs:
           DBT_PROD_USER: ${{ secrets.DBT_PROD_USER || secrets.DBT_DEV_USER || 'sa' }}
           DBT_PROD_PASSWORD: ${{ secrets.DBT_PROD_PASSWORD || secrets.DBT_DEV_PASSWORD || 'Password123!' }}
           DBT_PROD_DATABASE: ${{ secrets.DBT_PROD_DATABASE || secrets.DBT_DEV_DATABASE || 'AdventureWorks2014' }}
+          DBT_ODBC_DRIVER: "ODBC Driver 18 for SQL Server"
         run: |
           dbt source freshness --profiles-dir ../.github/dbt --target ${{ needs.preflight.outputs.target_env }} --output json
           dbt list --profiles-dir ../.github/dbt --target ${{ needs.preflight.outputs.target_env }} --resource-type model
@@ -228,6 +262,7 @@ jobs:
           DBT_PROD_USER: ${{ secrets.DBT_PROD_USER || secrets.DBT_DEV_USER || 'sa' }}
           DBT_PROD_PASSWORD: ${{ secrets.DBT_PROD_PASSWORD || secrets.DBT_DEV_PASSWORD || 'Password123!' }}
           DBT_PROD_DATABASE: ${{ secrets.DBT_PROD_DATABASE || secrets.DBT_DEV_DATABASE || 'AdventureWorks2014' }}
+          DBT_ODBC_DRIVER: "ODBC Driver 18 for SQL Server"
         run: |
           dbt run --profiles-dir ../.github/dbt --target ${{ github.event.inputs.target_env }} --full-refresh
           dbt test --profiles-dir ../.github/dbt --target ${{ github.event.inputs.target_env }} --store-failures --fail-fast
