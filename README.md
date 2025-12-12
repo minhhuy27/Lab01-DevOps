@@ -12,22 +12,22 @@
 flowchart LR
     subgraph gh ["GitHub Actions"]
         ci["CI: lint + dbt deps/compile"]
-        deploy["Deploy: dbt deps + run/test (with DB creds) hoặc parse (fallback)"]
+        deploy["Deploy: dbt deps + run/test (with DB creds) or parse fallback"]
     end
 
     subgraph docker ["Docker Compose"]
-        sql["SQL Server<br/>AdventureWorks2014"]
-        airflow["AIRFLOW<br/>DAG dbt_pipeline"]
-        dbtcli["DBT CLI<br/>(container)"]
-        pg["Postgres<br/>Airflow metadata"]
+        sql["SQL Server\nAdventureWorks2014"]
+        airflow["AIRFLOW\nDAG dbt_pipeline"]
+        dbtcli["DBT CLI\n(container)"]
+        pg["Postgres\nAirflow metadata"]
     end
 
-    ext["AdventureWorks2014 .bak"] -->|restore on start| sql
+    ext["AdventureWorks2014 .bak"] -->|"restore on start"| sql
     gh -->|pull code / trigger| docker
     airflow -->|triggers| dbtcli
-    ci -->|dbt deps/compile| dbtcli
-    deploy -->|dbt deps/run/test (if DB)| dbtcli
-    deploy -->|dbt parse (no DB)| dbtcli
+    ci -->|"dbt deps/compile"| dbtcli
+    deploy -->|"dbt deps + run/test when DB"| dbtcli
+    deploy -->|"dbt parse fallback (no DB)"| dbtcli
 
     dbtcli -->|bronze models| bronze["Schema: bronze"]
     dbtcli -->|silver models| silver["Schema: silver"]
@@ -85,7 +85,6 @@ flowchart LR
    ```bash
    docker compose up -d
    ```
-   SQL Server tự tải & restore AdventureWorks2014.
 4) Kiểm tra services:
    - Airflow UI: http://localhost:8080 (admin/admin).
    - SQL Server: localhost:1433 (SA/YourStrong@Passw0rd).
