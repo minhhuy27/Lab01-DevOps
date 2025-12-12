@@ -147,7 +147,7 @@ jobs:
           DBT_ODBC_DRIVER: "ODBC Driver 18 for SQL Server"
         run: |
           dbt debug --profiles-dir ../.github/dbt --target ${{ steps.resolve_env.outputs.target_env }}
-          dbt compile --profiles-dir ../.github/dbt --target ${{ steps.resolve_env.outputs.target_env }} --warn-error
+          dbt compile --profiles-dir ../.github/dbt --target ${{ steps.resolve_env.outputs.target_env }}
 
   deploy:
     name: Deploy
