@@ -62,7 +62,7 @@ models:
         description: Product weight in source unit
       - name: product_line
         description: Product line code
-      - name: class
+      - name: product_class
         description: Product class code
       - name: style
         description: Product style code
@@ -178,7 +178,7 @@ models:
         description: Unit margin percentage using standard cost
       - name: last_modified_date
         description: Source system last modified timestamp
-    tests:
+    data_tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - sales_order_id

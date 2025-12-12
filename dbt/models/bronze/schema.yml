@@ -62,7 +62,7 @@ models:
         description: Days required to manufacture the product
       - name: product_line
         description: Product line code
-      - name: class
+      - name: product_class
         description: Product class code
       - name: style
         description: Product style code
@@ -139,7 +139,7 @@ models:
           - not_null
       - name: last_modified_date
         description: Last modified timestamp from source rows
-    tests:
+    data_tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - sales_order_id
