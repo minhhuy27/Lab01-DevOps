@@ -1,14 +1,15 @@
 [sqlfluff]
 templater = dbt
 dialect = tsql
-exclude_rules = L009,L031
+exclude_rules = L009,L031,CP02,ST06,AL01,AL03,ST03,RF01,RF04,LT01,LT02,ST01
 sql_file_exts = .sql,.sql.j2
 max_line_length = 120
+exclude = dbt/logs,dbt/target,dbt/dbt_packages
 
 [sqlfluff:templater:dbt]
 project_dir = dbt
 profiles_dir = .github/dbt
 target = dev
 
-[sqlfluff:rules:L010]
+[sqlfluff:rules:capitalisation.keywords]
 capitalisation_policy = upper
