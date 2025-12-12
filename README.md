@@ -124,6 +124,15 @@ flowchart LR
 - dbt profile lỗi driver: rebuild image `dbt` (ODBC 18) bằng `docker compose build dbt`.
 - GitHub Actions lỗi ODBC/SQL: xem step cài driver & restore DB trong log CI/CD; runner cần quyền Docker.
 
-## 9. Contributors
+## 9. DBT docs & Lineage
+Sinh và xem tài liệu/lineage:
+```bash
+docker compose exec dbt dbt deps
+docker compose exec dbt dbt docs generate
+docker compose exec dbt dbt docs serve --host 0.0.0.0 --port 8001
+```
+Mở http://localhost:8001 để xem catalog và DBT Lineage Graph (bronze → silver → gold).
+
+## 10. Contributors
 - Lê Tuấn Anh - MSSV: 22120011
 - Nguyễn Minh Huy - MSSV: 22120137
