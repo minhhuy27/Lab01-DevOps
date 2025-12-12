@@ -32,6 +32,8 @@ on:
 env:
   PYTHON_VERSION: "3.11"
   DBT_PROFILES_DIR: ".github/dbt"
+permissions:
+  contents: write
 
 jobs:
   preflight:
@@ -105,6 +107,7 @@ jobs:
           DBT_PROD_PASSWORD: Password123!
           DBT_PROD_DATABASE: AdventureWorks2014
           DBT_ODBC_DRIVER: "ODBC Driver 18 for SQL Server"
+          LD_LIBRARY_PATH: /opt/microsoft/msodbcsql18/lib64:${LD_LIBRARY_PATH}
         run: |
           dbt debug --profiles-dir ../.github/dbt --target ${{ steps.resolve_env.outputs.target_env }}
           dbt compile --profiles-dir ../.github/dbt --target ${{ steps.resolve_env.outputs.target_env }}
@@ -149,6 +152,7 @@ jobs:
           DBT_PROD_PASSWORD: Password123!
           DBT_PROD_DATABASE: AdventureWorks2014
           DBT_ODBC_DRIVER: "ODBC Driver 18 for SQL Server"
+          LD_LIBRARY_PATH: /opt/microsoft/msodbcsql18/lib64:${LD_LIBRARY_PATH}
         run: dbt run --profiles-dir ../.github/dbt --target ${{ needs.preflight.outputs.target_env }} --fail-fast
 
       - name: Data quality tests
@@ -163,6 +167,7 @@ jobs:
           DBT_PROD_PASSWORD: Password123!
           DBT_PROD_DATABASE: AdventureWorks2014
           DBT_ODBC_DRIVER: "ODBC Driver 18 for SQL Server"
+          LD_LIBRARY_PATH: /opt/microsoft/msodbcsql18/lib64:${LD_LIBRARY_PATH}
         run: dbt test --profiles-dir ../.github/dbt --target ${{ needs.preflight.outputs.target_env }} --store-failures --fail-fast
 
       - name: Post-deployment health checks
@@ -177,6 +182,7 @@ jobs:
           DBT_PROD_PASSWORD: Password123!
           DBT_PROD_DATABASE: AdventureWorks2014
           DBT_ODBC_DRIVER: "ODBC Driver 18 for SQL Server"
+          LD_LIBRARY_PATH: /opt/microsoft/msodbcsql18/lib64:${LD_LIBRARY_PATH}
         run: |
           dbt source freshness --profiles-dir ../.github/dbt --target ${{ needs.preflight.outputs.target_env }} --output json
           dbt list --profiles-dir ../.github/dbt --target ${{ needs.preflight.outputs.target_env }} --resource-type model
@@ -271,6 +277,7 @@ jobs:
           DBT_PROD_PASSWORD: Password123!
           DBT_PROD_DATABASE: AdventureWorks2014
           DBT_ODBC_DRIVER: "ODBC Driver 18 for SQL Server"
+          LD_LIBRARY_PATH: /opt/microsoft/msodbcsql18/lib64:${LD_LIBRARY_PATH}
         run: |
           dbt run --profiles-dir ../.github/dbt --target ${{ github.event.inputs.target_env }} --full-refresh
           dbt test --profiles-dir ../.github/dbt --target ${{ github.event.inputs.target_env }} --store-failures --fail-fast
