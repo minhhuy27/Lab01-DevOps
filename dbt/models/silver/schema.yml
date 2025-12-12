@@ -178,7 +178,7 @@ models:
         description: Unit margin percentage using standard cost
       - name: last_modified_date
         description: Source system last modified timestamp
-    tests:
+    data_tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - sales_order_id
