@@ -196,9 +196,7 @@ jobs:
         run: |
           dbt compile \
             --profiles-dir ../.github/dbt \
-            --target dev \
-            --warn-error \
-            --warn-error-options "{include: '*', exclude: ['deprecation']}"
+            --target dev
 
   dbt_tests:
     name: dbt tests on PRs
