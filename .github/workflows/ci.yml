@@ -111,10 +111,14 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install SQLFluff
+      - name: Install SQLFluff and dbt deps
         run: |
           python -m pip install --upgrade pip
-          pip install sqlfluff sqlfluff-templater-dbt dbt-core dbt-sqlserver
+          pip install -r dbt/requirements.txt sqlfluff sqlfluff-templater-dbt
+
+      - name: Install dbt packages
+        working-directory: dbt
+        run: dbt deps --profiles-dir ../.github/dbt --target dev
 
       - name: Lint SQL models
         run: sqlfluff lint dbt/models
