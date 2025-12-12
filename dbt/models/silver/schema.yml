@@ -62,7 +62,7 @@ models:
         description: Product weight in source unit
       - name: product_line
         description: Product line code
-      - name: class
+      - name: product_class
         description: Product class code
       - name: style
         description: Product style code
