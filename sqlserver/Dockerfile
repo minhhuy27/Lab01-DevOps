@@ -21,5 +21,5 @@ RUN chmod +x /tmp/restore_db.sh
 # Switch back to mssql user
 USER mssql
 
-# Start SQL Server and keep it running
-CMD /opt/mssql/bin/sqlservr 
+# Start SQL Server and restore AdventureWorks2014 before waiting on the server
+CMD /bin/bash -c "/opt/mssql/bin/sqlservr & /tmp/restore_db.sh & wait"

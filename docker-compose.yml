@@ -11,6 +11,11 @@ services:
       - "1433:1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "YourStrong@Passw0rd", "-Q", "SELECT name FROM sys.databases WHERE name='AdventureWorks2014'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     networks:
       - dbt_airflow_network
 
@@ -83,7 +88,8 @@ services:
       context: ./dbt
       dockerfile: Dockerfile
     depends_on:
-      - sqlserver
+      sqlserver:
+        condition: service_healthy
     volumes:
       - ./dbt:/usr/app/dbt
     command: tail -f /dev/null # Keep container running
