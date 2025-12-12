@@ -193,7 +193,7 @@ jobs:
           DBT_DEV_USER: ${{ secrets.DBT_DEV_USER || 'sa' }}
           DBT_DEV_PASSWORD: ${{ secrets.DBT_DEV_PASSWORD || 'Password123!' }}
           DBT_DEV_DATABASE: ${{ secrets.DBT_DEV_DATABASE || 'AdventureWorks2014' }}
-        run: dbt compile --profiles-dir ../.github/dbt --target dev --warn-error --warn-error-options "exclude=deprecation"
+        run: dbt compile --profiles-dir ../.github/dbt --target dev --warn-error --warn-error-options "{exclude: ['deprecation']}"
 
   dbt_tests:
     name: dbt tests on PRs
